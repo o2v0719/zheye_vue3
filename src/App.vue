@@ -4,17 +4,13 @@
     <form action="">
       <div class="mb-3">
         <label class="form-label">邮箱地址</label>
-        <validate-input :rules="emailRules" v-model="emailVal"></validate-input>
-        <p>{{emailVal}}</p>
+        <validate-input :rules="emailRules" v-model="emailVal" placeholder="请输入邮箱地址" type="text"></validate-input>
+        <p>在父组件中展示{{emailVal}}</p>
       </div>
+
       <div class="mb-3">
-        <label for="exampleInputEmail1" class="form-label">Email address</label>
-        <input type="email" class="form-control" id="exampleInputEmail1" v-model="emailRef.val" @blur="validateEmail">
-        <div class="form-text" v-if="emailRef.error">{{emailRef.message}}</div>
-      </div>
-      <div class="mb-3">
-        <label for="exampleInputPassword1" class="form-label">Password</label>
-        <input type="password" class="form-control" id="exampleInputPassword1">
+        <label for="exampleInputPassword1" class="form-label">密码</label>
+        <validate-input type="password" class="form-control" placeholder="请输入密码" :rules="passwordRules" v-model="passwordVal" />
       </div>
     </form>
     <column-list :list="list"></column-list>
@@ -67,9 +63,15 @@ export default defineComponent({
   },
   setup() {
     const emailVal = ref('viking');
+    const passwordVal = ref('');
     const emailRules: RulesProp = [
       { type: 'required', message: '电子邮件地址不能为空' },
       { type: 'email', message: '请输入正确的电子邮箱格式' },
+      { type: 'range', message: '输入字符数超出限制' }
+    ];
+    const passwordRules: RulesProp = [
+      { type: 'required', message: '密码不能为空' },
+      { type: 'password', message: '请输入正确的密码格式' },
       { type: 'range', message: '输入字符数超出限制' }
     ];
     const emailRef = reactive({
@@ -88,7 +90,7 @@ export default defineComponent({
     };
     return {
       list: testData,
-      currentUser, emailRef, validateEmail, emailRules, emailVal
+      currentUser, emailRef, validateEmail, emailRules, emailVal, passwordVal, passwordRules
     };
   }
 });
