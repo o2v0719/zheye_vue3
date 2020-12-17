@@ -7,7 +7,8 @@
 </template>
 
 <script lang='ts'>
-import { defineComponent, reactive, PropType } from 'vue';
+import { defineComponent, reactive, PropType, onMounted } from 'vue';
+import { emitter } from './ValidateForm.vue';
 const emailReg = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 interface RuleProp {
   type: 'required' | 'email' | 'range' | 'password';
@@ -19,12 +20,12 @@ export default defineComponent({
     rules: Array as PropType<RulesProp>,
     modelValue: String
   },
-  // 杜绝子组件从父组件继承标签了里的自定义属性. (但是在$attrs 中存在)
+  // inheritAttrs :false . 杜绝子组件从父组件继承标签里的自定义属性. (但是在$attrs 中存在)
   // 有了inheritAttrs :false 和 $attrs ，就可以手动决定这些attribute会被赋予哪个元素
 
   inheritAttrs: false,
   setup(props, context) {
-    console.log(context.attrs);
+    // console.log(context.attrs);
     const inputRef = reactive({
       val: props.modelValue || '',
       error: false,
@@ -51,8 +52,13 @@ export default defineComponent({
           return passed;
         });
         inputRef.error = !allPassed;
+        return allPassed;
       }
+      return true;
     };
+    onMounted(() => {
+      emitter.emit('form-item-created', validateInput);
+    });
     return {
       inputRef, validateInput, updateValue
     };

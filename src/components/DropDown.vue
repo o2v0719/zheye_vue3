@@ -29,7 +29,6 @@ export default defineComponent({
     const isClickOutside = useClickOutside(dropdownRef);
     // 在下拉列表打开的情况下，点击了下拉列表外的元素 => 关闭下拉列表
     // 用watch函数来监测响应式对象的变化
-
     watch(isClickOutside, () => {
       if (isOpen.value && isClickOutside.value) {
         isOpen.value = false;

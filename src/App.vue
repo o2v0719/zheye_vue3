@@ -1,18 +1,23 @@
 <template>
   <div class="container">
     <global-header :user="currentUser"></global-header>
-    <form action="">
+    <!-- form-submit 子传父 -->
+    <validate-form @form-submit="onFormSubmit">
+      <!-- 邮箱 -->
       <div class="mb-3">
         <label class="form-label">邮箱地址</label>
-        <validate-input :rules="emailRules" v-model="emailVal" placeholder="请输入邮箱地址" type="text"></validate-input>
+        <validate-input :rules="emailRules" v-model="emailVal" placeholder="请输入邮箱地址" type="text" ref="inputRef"></validate-input>
         <p>在父组件中展示{{emailVal}}</p>
       </div>
-
+      <!-- 密码 -->
       <div class="mb-3">
         <label for="exampleInputPassword1" class="form-label">密码</label>
         <validate-input type="password" class="form-control" placeholder="请输入密码" :rules="passwordRules" v-model="passwordVal" />
       </div>
-    </form>
+      <template v-slot:submit>
+        <span class="btn btn-danger">Submit</span>
+      </template>
+    </validate-form>
     <column-list :list="list"></column-list>
   </div>
 </template>
@@ -23,6 +28,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import ColumnList, { ColumnProps } from './components/ColumnList.vue';
 import ValidateInput, { RulesProp } from './components/ValidateInput.vue';
 import GlobalHeader, { UserProps } from './components/GlobalHeader.vue';
+import ValidateForm from './components/ValidateForm.vue';
 const currentUser: UserProps = {
   isLogin: true,
   name: 'viking'
@@ -59,10 +65,11 @@ export default defineComponent({
   name: 'App',
   components: {
     ColumnList,
-    GlobalHeader, ValidateInput
+    GlobalHeader, ValidateInput, ValidateForm
   },
   setup() {
-    const emailVal = ref('viking');
+    const inputRef = ref<any>();
+    const emailVal = ref('');
     const passwordVal = ref('');
     const emailRules: RulesProp = [
       { type: 'required', message: '电子邮件地址不能为空' },
@@ -88,9 +95,12 @@ export default defineComponent({
         emailRef.message = "should be valid address";
       }
     };
+    const onFormSubmit = (result: boolean) => {
+      console.log('result', result);
+    };
     return {
-      list: testData,
-      currentUser, emailRef, validateEmail, emailRules, emailVal, passwordVal, passwordRules
+      list: testData, inputRef,
+      currentUser, emailRef, validateEmail, emailRules, emailVal, passwordVal, passwordRules, onFormSubmit
     };
   }
 });
