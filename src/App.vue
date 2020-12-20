@@ -3,10 +3,12 @@
     <global-header :user="currentUser"></global-header>
     <!-- form-submit 子传父 -->
     <validate-form @form-submit="onFormSubmit">
+      <!-- 置入default插槽 --start -->
       <!-- 邮箱 -->
       <div class="mb-3">
         <label class="form-label">邮箱地址</label>
-        <validate-input :rules="emailRules" v-model="emailVal" placeholder="请输入邮箱地址" type="text" ref="inputRef"></validate-input>
+        <validate-input :rules="emailRules" v-model="emailVal" placeholder="请输入邮箱地址" type="text"></validate-input>
+        <!-- 注意在自定义组件上使用v-model -->
         <p>在父组件中展示{{emailVal}}</p>
       </div>
       <!-- 密码 -->
@@ -14,9 +16,13 @@
         <label for="exampleInputPassword1" class="form-label">密码</label>
         <validate-input type="password" class="form-control" placeholder="请输入密码" :rules="passwordRules" v-model="passwordVal" />
       </div>
+      <!-- 置入default插槽 --end -->
+
+      <!-- 置入submit插槽 --start -->
       <template v-slot:submit>
         <span class="btn btn-danger">Submit</span>
       </template>
+      <!-- 置入submit插槽 --end -->
     </validate-form>
     <column-list :list="list"></column-list>
   </div>
@@ -68,7 +74,7 @@ export default defineComponent({
     GlobalHeader, ValidateInput, ValidateForm
   },
   setup() {
-    const inputRef = ref<any>();
+    // const inputRef = ref<any>();
     const emailVal = ref('');
     const passwordVal = ref('');
     const emailRules: RulesProp = [
@@ -99,7 +105,7 @@ export default defineComponent({
       console.log('result', result);
     };
     return {
-      list: testData, inputRef,
+      list: testData,
       currentUser, emailRef, validateEmail, emailRules, emailVal, passwordVal, passwordRules, onFormSubmit
     };
   }

@@ -2,6 +2,7 @@
   <div class="validate-input-container pb-3">
     <input type="text" class="form-control" :class="{'is-invalid':inputRef.error}" :value="inputRef.val" @input="updateValue"
       @blur="validateInput" v-bind="$attrs">
+    <!-- 注意v-bind $attrs 属性 -->
     <span v-if="inputRef.error" class="invalid-feedback">{{inputRef.message}}</span>
   </div>
 </template>
@@ -56,6 +57,7 @@ export default defineComponent({
       }
       return true;
     };
+    // 子组件定义的验证事件
     onMounted(() => {
       emitter.emit('form-item-created', validateInput);
     });

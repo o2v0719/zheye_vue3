@@ -12,7 +12,7 @@
 
 <script lang='ts'>
 import { defineComponent, onUnmounted } from 'vue';
-// 非父子关系通信
+// slot关系通信
 import mitt from 'mitt';
 
 // 创建一个监听器实例
@@ -27,11 +27,12 @@ export default defineComponent({
   setup(props, ctx) {
     let funcArr: ValidateFunc[] = [];
     const submitForm = () => {
-      // 使用every方法遍历验证，把结果发出去
+      // 使用every方法遍历验证
       const result = funcArr.map(func => func()).every(result => result);
+      // 先用map ，可以保证每个func都可以执行一次，确保了整个表单验证的完整性。
       ctx.emit('form-submit', result);
     };
-    // 注意！！
+    // 注意！！ callback 回调函数，作用是如果“验证函数”存在，放到数组中 . 参数func对应的实参就是valdiateInput函数
     const callback = (func?: ValidateFunc) => {
       if (func) {
         funcArr.push(func);
