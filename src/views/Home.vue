@@ -1,5 +1,6 @@
 <template>
   <div class="home-page">
+    <h2>{{biggerColumnLen}}</h2>
     <section class="py-5 text-center container">
       <div class="row py-lg-5">
         <div class="col-lg-6 col-md-8 mx-auto">
@@ -18,14 +19,23 @@
 
 <script lang='ts'>
 import ColumnList from '../components/ColumnList.vue';
-import { testData } from '../testData';
-import { defineComponent } from 'vue';
+import { GlobalDataProps } from '../store';
+import { defineComponent, computed } from 'vue';
+import { useStore } from 'vuex';
+
+
 export default defineComponent({
   name: 'Home',
   components: { ColumnList },
   setup() {
+    const store = useStore<GlobalDataProps>();
+    // 利用计算属性
+    const list = computed(() => store.state.columns);
+    // id 大于2的column有几个
+    //   这个数据存放到store中的getters，类似于计算属性
+    const biggerColumnLen = computed(() => store.getters.biggerColumnsLen);
     return {
-      list: testData
+      list, biggerColumnLen
     };
   }
 });
