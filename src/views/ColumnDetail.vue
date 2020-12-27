@@ -29,7 +29,7 @@ export default defineComponent({
     // 从当前路由获取currentId
     const currentId = +route.params.id;
     const column = computed(() => store.getters.getColumnById(currentId));
-    const list = computed(() => store.getters.getPostsById(currentId));
+    const list = computed(() => store.getters.getPostsByCid(currentId));
     return {
       list, column
     };

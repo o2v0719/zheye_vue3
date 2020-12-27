@@ -1,6 +1,5 @@
 <template>
   <div class="home-page">
-    <h2>{{biggerColumnLen}}</h2>
     <section class="py-5 text-center container">
       <div class="row py-lg-5">
         <div class="col-lg-6 col-md-8 mx-auto">
@@ -31,11 +30,9 @@ export default defineComponent({
     const store = useStore<GlobalDataProps>();
     // 利用计算属性
     const list = computed(() => store.state.columns);
-    // id 大于2的column有几个
-    //   这个数据存放到store中的getters，类似于计算属性
-    const biggerColumnLen = computed(() => store.getters.biggerColumnsLen);
+
     return {
-      list, biggerColumnLen
+      list
     };
   }
 });
