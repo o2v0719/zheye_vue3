@@ -1,4 +1,5 @@
 import { createStore } from 'vuex';
+
 import { testData, testPosts, ColumnProps, PostProps } from './testData';
 export { ColumnProps, PostProps } from './testData';
 interface UserProps {
