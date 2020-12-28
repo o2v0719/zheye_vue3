@@ -19,7 +19,7 @@
 <script lang='ts'>
 import ColumnList from '../components/ColumnList.vue';
 import { GlobalDataProps } from '../store';
-import { defineComponent, computed } from 'vue';
+import { defineComponent, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 
 
@@ -30,7 +30,9 @@ export default defineComponent({
     const store = useStore<GlobalDataProps>();
     // 利用计算属性
     const list = computed(() => store.state.columns);
-
+    onMounted(() => {
+      store.dispatch('fetchColumns');
+    });
     return {
       list
     };
