@@ -21,17 +21,19 @@ export interface PostProps {
   createdAt: string;
   column: string;
 }
-interface UserProps {
+export interface UserProps {
   isLogin: boolean;
-  name?: string;
-  id?: number;
-  column?: number;
+  nickName?: string;
+  _id?: string;
+  column?: string;
+  email?: string;
 }
 export interface GlobalDataProps {
   loading: boolean;
   columns: ColumnProps[];
   posts: PostProps[];
   user: UserProps;
+  token: string;
 }
 // 封装一个axios请求
 const getAndCommit = async (
@@ -43,15 +45,27 @@ const getAndCommit = async (
   const { data } = await axios.get(url);
   commit(mutationName, data);
 };
+const postAndCommit = async (
+  url: string,
+  mutationName: string,
+  commit: Commit,
+  payload: any
+) => {
+  // 加载进度条状态管理
+  const { data } = await axios.post(url, payload);
+  commit(mutationName, data);
+  return data;
+};
 const store = createStore<GlobalDataProps>({
   state: {
+    token: '',
     loading: false,
     columns: [],
     posts: [],
-    user: { isLogin: true, name: 'viking', column: 1 }
+    user: { isLogin: false }
   },
   mutations: {
-    login(state) {
+    /*  login(state) {
       state.user = {
         ...state.user,
         //  向前覆盖！！！
@@ -59,7 +73,7 @@ const store = createStore<GlobalDataProps>({
         isLogin: true,
         name: 'viking'
       };
-    },
+    }, */
     createPost(state, newPost) {
       state.posts.push(newPost);
     },
@@ -74,6 +88,15 @@ const store = createStore<GlobalDataProps>({
     },
     setLoading(state, status) {
       state.loading = status;
+    },
+    login(state, rawData) {
+      const { token } = rawData.data;
+      state.token = token;
+      // https://github.com/axios/axios
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    },
+    fetchCurrentUser(state, rawData) {
+      state.user = { isLogin: true, ...rawData.data };
     }
   },
   actions: {
@@ -105,6 +128,18 @@ const store = createStore<GlobalDataProps>({
     },
     fetchPosts({ commit }, cid) {
       getAndCommit(`/columns/${cid}/posts`, 'fetchColumn', commit);
+    },
+    login({ commit }, payload) {
+      return postAndCommit('/user/login', 'login', commit, payload);
+    },
+    fetchCurrentUser({ commit }) {
+      getAndCommit('/user/current', 'fetchCurrentUser', commit);
+    },
+    // 组合action 处理复杂异步
+    loginAndFetch({ dispatch }, loginData) {
+      return dispatch('login', loginData).then(() => {
+        return dispatch('fetchCurrentUser');
+      });
     }
   },
   getters: {

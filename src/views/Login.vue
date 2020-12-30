@@ -34,10 +34,15 @@ export default defineComponent({
     ];
     const onFormSubmit = (result: boolean) => {
       if (result) {
-        // 成功登陆，跳转到首页
-        router.push('/');
-        // 全局状态管理
-        store.commit('login');
+        const payload = {
+          email: emailVal.value,
+          password: passwordVal.value
+        };
+        store.dispatch('loginAndFetch', payload).then(data => {
+          console.log(data);
+          // 成功登陆，跳转到首页
+          router.push('/');
+        });
       }
     };
     return {
