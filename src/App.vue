@@ -1,7 +1,9 @@
 <template>
   <div class="container">
     <global-header :user="currentUser"></global-header>
+    <h1>{{error.message}}</h1>
     <loader text="拼命加载中" background="rgba(0,0,0,.8)" v-if="isLoading">正在读取😀</loader>
+    <message type="error" :message="error.message" v-if="error.status"></message>
     <router-view></router-view>
     <footer class="text-center py-4 text-secondary bg-light mt-6">
       <small>
@@ -18,22 +20,34 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
+import { defineComponent, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
+import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import GlobalHeader from './components/GlobalHeader.vue';
+import Message from './components/Message.vue';
 import Loader from './components/Loader.vue';
+import { GlobalDataProps } from './store';
 export default defineComponent({
   name: 'App',
   components: {
-    GlobalHeader, Loader
+    GlobalHeader, Loader, Message
   },
   setup() {
-    const store = useStore();
+    const store = useStore<GlobalDataProps>();
     const currentUser = computed(() => store.state.user);
     const isLoading = computed(() => store.state.loading);
+    const token = computed(() => store.state.token);
+    const error = computed(() => store.state.error);
+    onMounted(() => {
+      // 如果没有登陆，且token存在
+      if (!currentUser.value.isLogin && token.value) {
+        axios.defaults.headers.common.Authorization = `Bearer ${token.value}`;
+        store.dispatch('fetchCurrentUser');
+      }
+    });
     return {
-      currentUser, isLoading
+      currentUser, isLoading, error
     };
   }
 });

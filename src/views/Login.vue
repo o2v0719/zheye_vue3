@@ -42,6 +42,8 @@ export default defineComponent({
           console.log(data);
           // 成功登陆，跳转到首页
           router.push('/');
+        }).catch(e => {
+          console.log(e);
         });
       }
     };

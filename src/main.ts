@@ -28,10 +28,22 @@ axios.interceptors.request.use(config => {
 // });
 
 // 响应拦截
-axios.interceptors.response.use(config => {
-  store.commit('setLoading', false);
-  return config;
-});
+axios.interceptors.response.use(
+  // 响应成功的处理逻辑
+  config => {
+    store.commit('setLoading', false);
+    return config;
+  },
+  // 响应失败的处理逻辑
+  e => {
+    console.log(e.response);
+    const { error } = e.response.data;
+    // 在mutation 中处理的逻辑
+    store.commit('setError', { status: true, message: error });
+    store.commit('setLoading', false);
+    return Promise.reject(error);
+  }
+);
 const app = createApp(App);
 // vue3 使用use 插件。
 app.use(router);

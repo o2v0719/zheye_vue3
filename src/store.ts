@@ -28,7 +28,12 @@ export interface UserProps {
   column?: string;
   email?: string;
 }
+export interface GlobalErrorProps {
+  status: boolean;
+  message?: string;
+}
 export interface GlobalDataProps {
+  error: GlobalErrorProps;
   loading: boolean;
   columns: ColumnProps[];
   posts: PostProps[];
@@ -58,7 +63,8 @@ const postAndCommit = async (
 };
 const store = createStore<GlobalDataProps>({
   state: {
-    token: '',
+    error: { status: false },
+    token: localStorage.getItem('token') || '',
     loading: false,
     columns: [],
     posts: [],
@@ -89,10 +95,15 @@ const store = createStore<GlobalDataProps>({
     setLoading(state, status) {
       state.loading = status;
     },
+    setError(state, e: GlobalErrorProps) {
+      state.error = e;
+    },
     login(state, rawData) {
       const { token } = rawData.data;
       state.token = token;
       // https://github.com/axios/axios
+      // 登陆成功后，把token保存到localStorage中
+      localStorage.setItem('token', token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     },
     fetchCurrentUser(state, rawData) {
