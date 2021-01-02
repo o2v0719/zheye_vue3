@@ -50,6 +50,7 @@ export default defineComponent({
           setTimeout(() => {
             // 成功登陆，跳转到首页
             router.push('/');
+            console.log(store.state.user.isLogin);
           }, 3000);
         }).catch(e => {
           console.log(e);
