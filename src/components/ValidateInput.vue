@@ -17,8 +17,9 @@ import { defineComponent, reactive, PropType, onMounted } from 'vue';
 import { emitter } from './ValidateForm.vue';
 const emailReg = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 interface RuleProp {
-  type: 'required' | 'email' | 'range' | 'password';
+  type: 'required' | 'email' | 'password' | 'custom';
   message: string;
+  validator?: () => boolean;
 };
 export type RulesProp = RuleProp[];
 export type TagType = 'input' | 'textarea';
@@ -57,9 +58,10 @@ export default defineComponent({
           switch (rule.type) {
             case 'required': passed = (inputRef.val.trim() != ''); break;
             case 'email': passed = emailReg.test(inputRef.val); break;
-            case 'range': passed = inputRef.val.split('').length < 30 && inputRef.val.split('').length > 8; break;
-            case 'password': passed = inputRef.val.split('').length < 18 && inputRef.val.split('').length > 8; break;
-            default: break;
+            case 'password': passed = inputRef.val.split('').length < 18 && inputRef.val.split('').length > 6; break;
+            case 'custom': passed = rule.validator ? rule.validator() : true; break;
+            default:
+              break;
           }
           return passed;
         });
