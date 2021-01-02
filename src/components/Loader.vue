@@ -11,7 +11,7 @@
   </teleport>
 </template>;
 <script lang="ts">
-import { defineComponent, onUnmounted } from 'vue';
+import { defineComponent } from 'vue';
 import useDOMCreate from '../hooks/useDomCreate';
 export default defineComponent({
   props: {

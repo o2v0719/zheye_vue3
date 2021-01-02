@@ -19,6 +19,8 @@ axios.interceptors.request.use(config => {
     config.data = { ...config.data, icode: '5A243FEA06B889FE' };
   }
   store.commit('setLoading', true);
+  // 重置error
+  store.commit('setError', { status: false, message: '' });
   return config;
 });
 // 拦截器携带参数简化
@@ -36,7 +38,6 @@ axios.interceptors.response.use(
   },
   // 响应失败的处理逻辑
   e => {
-    console.log(e.response);
     const { error } = e.response.data;
     // 在mutation 中处理的逻辑
     store.commit('setError', { status: true, message: error });

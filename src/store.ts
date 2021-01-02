@@ -29,6 +29,7 @@ export interface UserProps {
   email?: string;
 }
 export interface GlobalErrorProps {
+  // true 表示错误存在
   status: boolean;
   message?: string;
 }
