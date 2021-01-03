@@ -1,7 +1,13 @@
 import { createStore, Commit } from 'vuex';
 import axios from 'axios';
 
-interface ImageProps {
+export interface ResponseType<P = {}> {
+  code: number;
+  msg?: string;
+  data?: P;
+  error?: string;
+}
+export interface ImageProps {
   _id?: string;
   url?: string;
   createdAt?: string;
@@ -50,6 +56,7 @@ const getAndCommit = async (
   // 加载进度条状态管理
   const { data } = await axios.get(url);
   commit(mutationName, data);
+  return data;
 };
 const postAndCommit = async (
   url: string,
@@ -109,6 +116,12 @@ const store = createStore<GlobalDataProps>({
     },
     fetchCurrentUser(state, rawData) {
       state.user = { isLogin: true, ...rawData.data };
+    },
+    logout(state) {
+      // 退出登陆：三件事
+      state.token = '';
+      localStorage.remove('token');
+      delete axios.defaults.headers.common.Authorization;
     }
   },
   actions: {
@@ -119,7 +132,7 @@ const store = createStore<GlobalDataProps>({
     }, */
     // 使用封装过的函数发起axios请求
     fetchColumns({ commit }) {
-      getAndCommit('/columns', 'fetchColumns', commit);
+      return getAndCommit('/columns', 'fetchColumns', commit);
     },
     // 使用参数解构来简化代码
     /* fetchColumn({ commit }, cid) {
@@ -136,16 +149,16 @@ const store = createStore<GlobalDataProps>({
       commit('fetchPosts', data);
     } */
     fetchColumn({ commit }, cid) {
-      getAndCommit(`/columns/${cid}`, 'fetchColumn', commit);
+      return getAndCommit(`/columns/${cid}`, 'fetchColumn', commit);
     },
     fetchPosts({ commit }, cid) {
-      getAndCommit(`/columns/${cid}/posts`, 'fetchColumn', commit);
+      return getAndCommit(`/columns/${cid}/posts`, 'fetchColumn', commit);
     },
     login({ commit }, payload) {
       return postAndCommit('/user/login', 'login', commit, payload);
     },
     fetchCurrentUser({ commit }) {
-      getAndCommit('/user/current', 'fetchCurrentUser', commit);
+      return getAndCommit('/user/current', 'fetchCurrentUser', commit);
     },
     // 组合action 处理复杂异步
     loginAndFetch({ dispatch }, loginData) {

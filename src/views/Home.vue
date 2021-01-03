@@ -11,7 +11,12 @@
         </div>
       </div>
     </section>
-    <uploader action="/upload"></uploader>
+    <uploader action="/upload" :beforeUpload="beforeUpload" @file-uploaded="onFileUploaded" @file-uploaded-error="onFileUploadedError">
+      <template #uploaded="slotProps">
+        <!-- 上传成功后在对应插槽处显示上传成功的图片 -->
+        <img :src="slotProps.uploadedData.data.url" width="500" />
+      </template>
+    </uploader>
     <h4 class="font-weight-bold text-center">发现精彩</h4>
     <column-list :list="list"></column-list>
   </div>
@@ -20,23 +25,39 @@
 <script lang='ts'>
 import ColumnList from '../components/ColumnList.vue';
 import Uploader from '../components/Uploader.vue';
-import { GlobalDataProps } from '../store';
+import { GlobalDataProps, ResponseType, ImageProps } from '../store';
 import { defineComponent, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
-
+import createMessage from '../components/createMessage';
 
 export default defineComponent({
   name: 'Home',
   components: { ColumnList, Uploader },
   setup() {
     const store = useStore<GlobalDataProps>();
-    // 利用计算属性
-    const list = computed(() => store.state.columns);
     onMounted(() => {
       store.dispatch('fetchColumns');
     });
+    // 利用计算属性
+    const list = computed(() => store.state.columns);
+    // 规定一个上传图片前的校验格式函数
+    const beforeUpload = (file: File) => {
+      const isJPG = file.type === 'image/jpeg';
+      if (!isJPG) {
+        createMessage('上传图片只能是JPG格式', 'error');
+      };
+      return isJPG;
+    };
+    const onFileUploaded = (rawData: ResponseType<ImageProps>) => {
+      if (rawData.data) {
+        createMessage(`已上传图片,ID ${rawData.data._id}`, 'success');
+      }
+    };
+    const onFileUploadedError = (rawData: ResponseType) => {
+      createMessage(`上传图片失败, ${rawData.error}`, 'error');
+    };
     return {
-      list
+      list, beforeUpload, onFileUploaded, onFileUploadedError
     };
   }
 });
