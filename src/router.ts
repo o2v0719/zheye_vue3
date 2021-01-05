@@ -63,7 +63,7 @@ router.beforeEach((to, from, next) => {
         })
         .catch(e => {
           console.log(e);
-          localStorage.romoveItem('token');
+          store.commit('logout');
           next('/login');
         });
     } else {

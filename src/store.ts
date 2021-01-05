@@ -11,6 +11,7 @@ export interface ImageProps {
   _id?: string;
   url?: string;
   createdAt?: string;
+  fitUrl?: string;
 }
 export interface ColumnProps {
   _id: string;
@@ -23,9 +24,10 @@ export interface PostProps {
   title: string;
   excerpt?: string;
   content?: string;
-  image?: ImageProps;
+  image?: ImageProps | string;
   createdAt?: string;
   column: string;
+  author?: string;
 }
 export interface UserProps {
   isLogin: boolean;
@@ -114,6 +116,7 @@ const store = createStore<GlobalDataProps>({
       localStorage.setItem('token', token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     },
+
     fetchCurrentUser(state, rawData) {
       state.user = { isLogin: true, ...rawData.data };
     },
@@ -165,6 +168,10 @@ const store = createStore<GlobalDataProps>({
       return dispatch('login', loginData).then(() => {
         return dispatch('fetchCurrentUser');
       });
+    },
+    // 发布文章
+    createPost({ commit }, payload) {
+      return postAndCommit('/posts', 'createPost', commit, payload);
     }
   },
   getters: {

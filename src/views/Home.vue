@@ -11,12 +11,6 @@
         </div>
       </div>
     </section>
-    <uploader action="/upload" :beforeUpload="beforeUpload" @file-uploaded="onFileUploaded" @file-uploaded-error="onFileUploadedError">
-      <template #uploaded="slotProps">
-        <!-- 上传成功后在对应插槽处显示上传成功的图片 -->
-        <img :src="slotProps.uploadedData.data.url" width="500" />
-      </template>
-    </uploader>
     <h4 class="font-weight-bold text-center">发现精彩</h4>
     <column-list :list="list"></column-list>
   </div>
@@ -24,7 +18,6 @@
 
 <script lang='ts'>
 import ColumnList from '../components/ColumnList.vue';
-import Uploader from '../components/Uploader.vue';
 import { GlobalDataProps, ResponseType, ImageProps } from '../store';
 import { defineComponent, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
@@ -32,7 +25,7 @@ import createMessage from '../components/createMessage';
 
 export default defineComponent({
   name: 'Home',
-  components: { ColumnList, Uploader },
+  components: { ColumnList },
   setup() {
     const store = useStore<GlobalDataProps>();
     onMounted(() => {
