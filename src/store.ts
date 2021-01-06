@@ -123,7 +123,7 @@ const store = createStore<GlobalDataProps>({
     logout(state) {
       // 退出登陆：三件事
       state.token = '';
-      localStorage.remove('token');
+      localStorage.removeItem('token');
       delete axios.defaults.headers.common.Authorization;
     }
   },
@@ -155,7 +155,7 @@ const store = createStore<GlobalDataProps>({
       return getAndCommit(`/columns/${cid}`, 'fetchColumn', commit);
     },
     fetchPosts({ commit }, cid) {
-      return getAndCommit(`/columns/${cid}/posts`, 'fetchColumn', commit);
+      return getAndCommit(`/columns/${cid}/posts`, 'fetchPosts', commit);
     },
     login({ commit }, payload) {
       return postAndCommit('/user/login', 'login', commit, payload);

@@ -1,6 +1,7 @@
 <template>
   <div class="file-upload">
     <div class="file-upload-container" @click.prevent="triggerUpload" v-bind="$attrs">
+      <!-- vm.$attrs 是一个属性，其包含了父作用域中不作为 prop 被识别 (且获取) 的特性绑定 (class 和 style 除外)。这些未识别的属性可以通过 v-bind="$attrs" 传入内部组件 -->
       <slot v-if="fileStatus==='loading'" name="loading">
         <button class="btn btn-primary">正在上传...</button>
       </slot>
@@ -32,7 +33,7 @@ export default defineComponent({
       type: Function as PropType<CheckFunction>
     }
   },
-  // 不要从应用到的父组件上继承class
+  // 根元素不要从应用到的父组件上继承class
   inheritAttrs: false,
   emit: ['file-uploaded', 'file-uploaded-error'],
   setup(props, ctx) {
@@ -57,7 +58,6 @@ export default defineComponent({
             return;
           }
         }
-
         fileStatus.value = 'loading';
         const formData = new FormData();
         formData.append('file', files[0]);
@@ -69,9 +69,11 @@ export default defineComponent({
           // console.log(resp.data);
           fileStatus.value = 'success';
           uploadedData.value = resp.data;
+          // 上传成功 返回信息
           ctx.emit('file-uploaded', resp.data);
         }).catch((e) => {
           fileStatus.value = 'error';
+          // 上传失败
           ctx.emit('file-uploaded-error', { e });
         }).finally(() => {
           if (fileInput.value) {

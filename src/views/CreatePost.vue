@@ -1,11 +1,12 @@
 <template>
   <div class="create-post-page">
     <h4>新建文章</h4>
-    <uploader action='/upload' :beforeUpload="uploadCheck" @file-uploaded="handleFileUpLoaded"
+    <uploader action='/upload' :beforeUpload="uploadCheck" @file-uploaded="handleFileUploaded"
       class="d-flex align-items-center justify-content-center bg-light text-secondary w-100 my-4">
       <h2>点击上传头图</h2>
       <template #loading>
         <div class="d-flex">
+          <!-- bootstrap 定义的一个旋转的小圈圈 -->
           <div class="spinner-border text-secondary" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>
@@ -64,6 +65,7 @@ export default defineComponent({
       { type: 'required', message: '文章详情不能为空' }
     ];
 
+    // 拿到返回的图片imageId
     const handleFileUploaded = (rawData: ResponseType<ImageProps>) => {
       if (rawData.data && rawData.data._id) {
         imageId = rawData.data._id;

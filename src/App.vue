@@ -20,9 +20,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, onMounted, watch } from 'vue';
+import { defineComponent, computed, watch } from 'vue';
 import { useStore } from 'vuex';
-import axios from 'axios';
+// import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import GlobalHeader from './components/GlobalHeader.vue';
 import Loader from './components/Loader.vue';
@@ -39,13 +39,7 @@ export default defineComponent({
     const isLoading = computed(() => store.state.loading);
     // const token = computed(() => store.state.token);
     const error = computed(() => store.state.error);
-    /*     onMounted(() => {
-          // 如果没有登陆，且token存在
-          if (!currentUser.value.isLogin && token.value) {
-            axios.defaults.headers.common.Authorization = `Bearer ${token.value}`;
-            store.dispatch('fetchCurrentUser');
-          }
-        }); */
+
     // watch 一个响应式对象的属性。使用getters改写
     watch(() => error.value.status, () => {
       const { status, message } = error.value;
