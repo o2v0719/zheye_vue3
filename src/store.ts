@@ -13,12 +13,14 @@ export interface ImageProps {
   createdAt?: string;
   fitUrl?: string;
 }
+// 专栏属性
 export interface ColumnProps {
   _id: string;
   title: string;
   avatar?: ImageProps;
   description: string;
 }
+// 文章属性
 export interface PostProps {
   _id?: string;
   title: string;
@@ -28,6 +30,7 @@ export interface PostProps {
   createdAt?: string;
   column: string;
   author?: string;
+  isHTML?: boolean;
 }
 export interface UserProps {
   isLogin: boolean;
@@ -35,6 +38,8 @@ export interface UserProps {
   _id?: string;
   column?: string;
   email?: string;
+  avatar?: ImageProps;
+  description?: string;
 }
 export interface GlobalErrorProps {
   // true 表示错误存在
@@ -125,6 +130,9 @@ const store = createStore<GlobalDataProps>({
       state.token = '';
       localStorage.removeItem('token');
       delete axios.defaults.headers.common.Authorization;
+    },
+    fetchPost(state, rawData) {
+      state.posts = [rawData.data];
     }
   },
   actions: {
@@ -172,6 +180,10 @@ const store = createStore<GlobalDataProps>({
     // 发布文章
     createPost({ commit }, payload) {
       return postAndCommit('/posts', 'createPost', commit, payload);
+    },
+    // 请求指定id的文章
+    fetchPost({ commit }, pid) {
+      return getAndCommit(`/posts/${pid}`, 'fetchPost', commit);
     }
   },
   getters: {
@@ -182,6 +194,9 @@ const store = createStore<GlobalDataProps>({
     },
     getPostsByCid: state => (cid: string) => {
       return state.posts.filter(post => post.column === cid);
+    },
+    getCurrentPost: state => (pid: string) => {
+      return state.posts.find(post => post._id === pid);
     }
   }
 });

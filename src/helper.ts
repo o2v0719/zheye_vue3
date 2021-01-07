@@ -1,16 +1,35 @@
-import { ColumnProps } from './store';
+import { ColumnProps, ImageProps, UserProps } from './store';
+// 计算适应设备的图片大小
 export function generateFitUrl(
-  column: ColumnProps,
+  data: ImageProps,
+  width: number,
+  height: number,
+  format = ['m_pad']
+) {
+  if (data && data.url) {
+    // 字符串，支持在不同红设备改变图片大小
+    const formatStr = format.reduce((prev, current) => {
+      return current + ',' + prev;
+    }, '');
+    data.fitUrl =
+      data.url +
+      `?x-oss-process=image/resize,${formatStr}h_${height},w_${width}`;
+  }
+}
+// 给栏 增加头像
+export function addColumnAvatar(
+  data: ColumnProps | UserProps,
   width: number,
   height: number
 ) {
-  if (column.avatar) {
-    column.avatar.fitUrl =
-      column.avatar.url +
-      `?x-oss-process=image/resize,m_pad,h_${height},w_${width}`;
+  if (data.avatar) {
+    generateFitUrl(data.avatar, width, height);
   } else {
-    column.avatar = {
-      fitUrl: require('@/assets/column.jpg')
+    const parseCol = data as ColumnProps;
+    data.avatar = {
+      fitUrl: require(parseCol.title
+        ? '@/assets/column.jpg'
+        : '@/assets/avatar.jpg')
     };
   }
 }
