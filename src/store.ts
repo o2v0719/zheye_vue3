@@ -29,7 +29,7 @@ export interface PostProps {
   image?: ImageProps | string;
   createdAt?: string;
   column: string;
-  author?: string;
+  author?: string | UserProps;
   isHTML?: boolean;
 }
 export interface UserProps {

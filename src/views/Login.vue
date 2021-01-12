@@ -37,7 +37,8 @@ export default defineComponent({
     ];
     const passwordVal = ref('');
     const passwordRules: RulesProp = [
-      { type: 'required', message: '密码不能为空' }
+      { type: 'required', message: '密码不能为空' },
+      { type: 'password', message: '请输入正确的密码格式' }
     ];
     const onFormSubmit = (result: boolean) => {
       if (result) {
@@ -46,12 +47,12 @@ export default defineComponent({
           password: passwordVal.value
         };
         store.dispatch('loginAndFetch', payload).then(() => {
-          createMessage('登陆成功，3秒以后跳转首页', 'success');
+          createMessage('登陆成功，2秒以后跳转首页', 'success');
           setTimeout(() => {
             // 成功登陆，跳转到首页
             router.push('/');
             console.log(store.state.user.isLogin);
-          }, 3000);
+          }, 2000);
         }).catch(e => {
           console.log(e);
         });

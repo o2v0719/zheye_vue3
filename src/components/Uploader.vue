@@ -17,7 +17,7 @@
 </template>
 
 <script lang='ts'>
-import { defineComponent, ref, PropType } from 'vue';
+import { defineComponent, ref, PropType, watch } from 'vue';
 import axios from 'axios';
 type UploadStatus = 'ready' | 'loading' | 'success' | 'error';
 // 一个自定义检查的函数类型
@@ -31,6 +31,9 @@ export default defineComponent({
     },
     beforeUpload: {
       type: Function as PropType<CheckFunction>
+    },
+    uploaded: {
+      type: Object
     }
   },
   // 根元素不要从应用到的父组件上继承class
@@ -38,8 +41,17 @@ export default defineComponent({
   emit: ['file-uploaded', 'file-uploaded-error'],
   setup(props, ctx) {
     const fileInput = ref<null | HTMLInputElement>(null);
-    const fileStatus = ref<UploadStatus>('ready');
-    const uploadedData = ref();
+    // uploaded 对象存在 表示上传成功
+    const fileStatus = ref<UploadStatus>(props.uploaded ? 'success' : 'ready');
+    const uploadedData = ref(props.uploaded);
+    // uploaded 是一个异步传递过来的对象。
+    // watch的第一个参数必须是一个响应式对象，或是一个有返回值的getter函数
+    watch(() => props.uploaded, (newValue) => {
+      if (newValue) {
+        fileStatus.value = 'success';
+        uploadedData.value = newValue;
+      }
+    });
     const triggerUpload = () => {
       // 把button的点击事件 转移到 被隐藏的inputDOM上
       if (fileInput.value) {
@@ -73,7 +85,7 @@ export default defineComponent({
           ctx.emit('file-uploaded', resp.data);
         }).catch((e) => {
           fileStatus.value = 'error';
-          // 上传失败
+          // 上传失败 
           ctx.emit('file-uploaded-error', { e });
         }).finally(() => {
           if (fileInput.value) {

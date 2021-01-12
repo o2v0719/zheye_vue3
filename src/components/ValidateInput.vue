@@ -1,11 +1,11 @@
 <template>
   <div class="validate-input-container pb-3">
-    <input type="text" class="form-control" :class="{'is-invalid':inputRef.error}" :value="inputRef.val" @input="updateValue"
-      @blur="validateInput" v-bind="$attrs" v-if="tag!=='textarea'">
+    <input type="text" class="form-control" :class="{'is-invalid':inputRef.error}" v-model="inputRef.val" @blur="validateInput"
+      v-bind="$attrs" v-if="tag!=='textarea'">
     <!-- 注意v-bind $attrs 属性 -->
 
-    <textarea v-else class="form-control" :class="{'is-invalid':inputRef.error}" :value="inputRef.val" @blur="validateInput"
-      @input="updateValue" v-bind="$attrs">
+    <textarea v-else class="form-control" :class="{'is-invalid':inputRef.error}" @blur="validateInput" v-model="inputRef.val"
+      v-bind="$attrs">
 
     </textarea>
     <span v-if="inputRef.error" class="invalid-feedback">{{inputRef.message}}</span>
@@ -13,7 +13,7 @@
 </template>
 
 <script lang='ts'>
-import { defineComponent, reactive, PropType, onMounted } from 'vue';
+import { defineComponent, reactive, PropType, onMounted, computed } from 'vue';
 import { emitter } from './ValidateForm.vue';
 const emailReg = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 interface RuleProp {
@@ -39,17 +39,16 @@ export default defineComponent({
   setup(props, context) {
     // console.log(context.attrs);
     const inputRef = reactive({
-      val: props.modelValue || '',
+      val: computed({
+        get: () => props.modelValue || '',
+        // [变化的时候，向外触发事件]
+        set: val => {
+          context.emit('update:modelValue', val);
+        }
+      }),
       error: false,
       message: '',
     });
-    // 自定义组件，vue3 数据绑定改造
-    const updateValue = (e: KeyboardEvent) => {
-      const targetValue = (e.target as HTMLInputElement).value;
-      inputRef.val = targetValue;
-      context.emit('update:modelValue', targetValue);
-    };
-
     const validateInput = () => {
       if (props.rules) {
         const allPassed = props.rules.every(rule => {
@@ -58,7 +57,7 @@ export default defineComponent({
           switch (rule.type) {
             case 'required': passed = (inputRef.val.trim() != ''); break;
             case 'email': passed = emailReg.test(inputRef.val); break;
-            case 'password': passed = inputRef.val.split('').length < 18 && inputRef.val.split('').length > 6; break;
+            case 'password': passed = inputRef.val.split('').length < 18 && inputRef.val.split('').length > 4; break;
             case 'custom': passed = rule.validator ? rule.validator() : true; break;
             default:
               break;
@@ -75,7 +74,7 @@ export default defineComponent({
       emitter.emit('form-item-created', validateInput);
     });
     return {
-      inputRef, validateInput, updateValue
+      inputRef, validateInput
     };
   }
 });
