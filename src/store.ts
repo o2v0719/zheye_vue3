@@ -205,11 +205,14 @@ const store = createStore<GlobalDataProps>({
     },
     // 发布文章
     createPost({ commit }, payload) {
-      return postAndCommit('/posts', 'createPost', commit, payload);
+      return asyncAndCommit('/posts', 'createPost', commit, {
+        method: 'post',
+        data: payload
+      });
     },
     // 请求指定id的文章
     fetchPost({ commit }, pid) {
-      return getAndCommit(`/posts/${pid}`, 'fetchPost', commit);
+      return asyncAndCommit(`/posts/${pid}`, 'fetchPost', commit);
     },
     // 编辑后更新文章
     updatePost({ commit }, { id, payload }) {
