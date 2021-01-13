@@ -155,6 +155,10 @@ const store = createStore<GlobalDataProps>({
           return post;
         }
       });
+    },
+    deletePost(state, { data }) {
+      // 留下和返回id不同的文章
+      state.posts = state.posts.filter(post => post._id !== data._id);
     }
   },
   actions: {
@@ -212,6 +216,12 @@ const store = createStore<GlobalDataProps>({
       return asyncAndCommit(`/posts/${id}`, 'updatePost', commit, {
         method: 'patch',
         data: payload
+      });
+    },
+    // 发布文章
+    deletePost({ commit }, id) {
+      return asyncAndCommit(`/posts/${id}`, 'deletePost', commit, {
+        method: 'delete'
       });
     }
   },
