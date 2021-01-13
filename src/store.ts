@@ -1,5 +1,5 @@
 import { createStore, Commit } from 'vuex';
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 
 export interface ResponseType<P = {}> {
   code: number;
@@ -76,6 +76,17 @@ const postAndCommit = async (
   commit(mutationName, data);
   return data;
 };
+// 把post 和 patch 整合到一起
+const asyncAndCommit = async (
+  url: string,
+  mutationName: string,
+  commit: Commit,
+  config: AxiosRequestConfig = { method: 'get' }
+) => {
+  const { data } = await axios(url, config);
+  commit(mutationName, data);
+  return data;
+};
 const store = createStore<GlobalDataProps>({
   state: {
     error: { status: false },
@@ -90,7 +101,7 @@ const store = createStore<GlobalDataProps>({
       state.user = {
         ...state.user,
         //  向前覆盖！！！
-        // es6 标准入门: 如果用户自定义的属性放在扩展运算符后面，则扩展运算符内部的同名属性会被覆盖。
+        // es6 标准入门: 如果用户自定义的属性放在扩展运算符后面(前后都可以），则扩展运算符内部的同名属性会被覆盖。
         isLogin: true,
         name: 'viking'
       };
@@ -133,6 +144,17 @@ const store = createStore<GlobalDataProps>({
     },
     fetchPost(state, rawData) {
       state.posts = [rawData.data];
+    },
+    updatePost(state, { data }) {
+      state.posts = state.posts.map(post => {
+        if (post._id === data._id) {
+          // 本地数据post 需要更新为data
+          return data;
+        } else {
+          // 本地数据post 不需要更新为data
+          return post;
+        }
+      });
     }
   },
   actions: {
@@ -184,6 +206,13 @@ const store = createStore<GlobalDataProps>({
     // 请求指定id的文章
     fetchPost({ commit }, pid) {
       return getAndCommit(`/posts/${pid}`, 'fetchPost', commit);
+    },
+    // 编辑后更新文章
+    updatePost({ commit }, { id, payload }) {
+      return asyncAndCommit(`/posts/${id}`, 'updatePost', commit, {
+        method: 'patch',
+        data: payload
+      });
     }
   },
   getters: {
