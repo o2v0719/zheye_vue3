@@ -85,6 +85,7 @@ const asyncAndCommit = async (
 ) => {
   const { data } = await axios(url, config);
   commit(mutationName, data);
+  // console.log(data);
   return data;
 };
 const store = createStore<GlobalDataProps>({
@@ -139,6 +140,7 @@ const store = createStore<GlobalDataProps>({
     logout(state) {
       // 退出登陆：三件事
       state.token = '';
+      state.user = { isLogin: false };
       localStorage.removeItem('token');
       delete axios.defaults.headers.common.Authorization;
     },
@@ -148,10 +150,10 @@ const store = createStore<GlobalDataProps>({
     updatePost(state, { data }) {
       state.posts = state.posts.map(post => {
         if (post._id === data._id) {
-          // 本地数据post 需要更新为data
+          //返回的data是被修改的那篇文章，
           return data;
         } else {
-          // 本地数据post 不需要更新为data
+          // 本地数据的其余post 不需要变化
           return post;
         }
       });
