@@ -32,7 +32,7 @@ export default defineComponent({
       store.dispatch('fetchColumns');
     });
     // 利用计算属性
-    const list = computed(() => store.state.columns);
+    const list = computed(() => store.getters.getColumns);
     // 规定一个上传图片前的校验格式函数
     const beforeUpload = (file: File) => {
       const isJPG = file.type === 'image/jpeg';

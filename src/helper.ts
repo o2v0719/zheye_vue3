@@ -65,10 +65,10 @@ interface TestProps {
   _id: string;
   name: string;
 }
-const testData: TestProps[] = [
+/* const testData: TestProps[] = [
   { _id: '1', name: 'a' },
   { _id: '2', name: 'b' }
-];
+]; */
 // 函数：把数组 => 对象
 // 使用extends 关键字 给泛型施加约束
 export const arrToObj = <T extends { _id?: string }>(arr: Array<T>) => {
@@ -80,18 +80,19 @@ export const arrToObj = <T extends { _id?: string }>(arr: Array<T>) => {
     // 类型断言:断言为一个更具体的对象
   }, {} as { [key: string]: T });
 };
-const result = arrToObj(testData);
+/* const result = arrToObj(testData);
 console.log(result);
-
+ */
 // indexable types 表示可索引类型。我们不知道对象或数组里面有哪种具体的key出现，但是可以给key一个约束，比如[key:string]
-const testData2: { [key: string]: TestProps } = {
+/* const testData2: { [key: string]: TestProps } = {
   1: { _id: '1', name: 'a' },
   2: { _id: '2', name: 'b' }
 };
-
+ */
 export const objToArr = <T>(obj: { [key: string]: T }) => {
   // Object.keys()语法，把对象中的key抽取出来形成数组。
   return Object.keys(obj).map(key => obj[key]);
 };
-const result2 = objToArr(testData2);
+/* const result2 = objToArr(testData2);
 console.log(result2);
+ */
