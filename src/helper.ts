@@ -77,7 +77,7 @@ export const arrToObj = <T extends { _id?: string }>(arr: Array<T>) => {
       prev[current._id] = current;
     }
     return prev;
-    // 类型断言:断言为一个更具体的对象
+    // 类型断言:断言为一个“类型更加具体”的对象
   }, {} as { [key: string]: T });
 };
 /* const result = arrToObj(testData);

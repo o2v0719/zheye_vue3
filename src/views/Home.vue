@@ -18,10 +18,9 @@
 
 <script lang='ts'>
 import ColumnList from '../components/ColumnList.vue';
-import { GlobalDataProps, ResponseType, ImageProps } from '../store';
+import { GlobalDataProps } from '../store';
 import { defineComponent, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
-import createMessage from '../components/createMessage';
 
 export default defineComponent({
   name: 'Home',
@@ -33,24 +32,8 @@ export default defineComponent({
     });
     // 利用计算属性
     const list = computed(() => store.getters.getColumns);
-    // 规定一个上传图片前的校验格式函数
-    const beforeUpload = (file: File) => {
-      const isJPG = file.type === 'image/jpeg';
-      if (!isJPG) {
-        createMessage('上传图片只能是JPG格式', 'error');
-      };
-      return isJPG;
-    };
-    const onFileUploaded = (rawData: ResponseType<ImageProps>) => {
-      if (rawData.data) {
-        createMessage(`已上传图片,ID ${rawData.data._id}`, 'success');
-      }
-    };
-    const onFileUploadedError = (rawData: ResponseType) => {
-      createMessage(`上传图片失败, ${rawData.error}`, 'error');
-    };
     return {
-      list, beforeUpload, onFileUploaded, onFileUploadedError
+      list
     };
   }
 });
