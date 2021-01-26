@@ -4,19 +4,20 @@ import router from './router';
 import store from './store';
 import App from './App.vue';
 
-// 5A243FEA06B889FE
+// 9E35FDE5D19C580A
 axios.defaults.baseURL = 'http://apis.imooc.com/api/';
 
 // 请求拦截
+// 注意icode 每一个月更新一次。慕课网。
 axios.interceptors.request.use(config => {
   // get 请求，添加到url中
-  config.params = { ...config.params, icode: '5A243FEA06B889FE' };
+  config.params = { ...config.params, icode: '9E35FDE5D19C580A' };
   // 其他请求添加到body中
   // 如果是上传文件 ，添加到FormData中。
   if (config.data instanceof FormData) {
-    config.data.append('icode', '5A243FEA06B889FE');
+    config.data.append('icode', '9E35FDE5D19C580A');
   } else {
-    config.data = { ...config.data, icode: '5A243FEA06B889FE' };
+    config.data = { ...config.data, icode: '9E35FDE5D19C580A' };
   }
   store.commit('setLoading', true);
   // 重置error
@@ -24,7 +25,7 @@ axios.interceptors.request.use(config => {
   return config;
 });
 // 拦截器携带参数简化
-// axios.get('/columns?icode=5A243FEA06B889FE');
+// axios.get('/columns?icode=9E35FDE5D19C580A');
 // axios.get('/columns').then(resp => {
 //   console.log(resp.data);
 // });

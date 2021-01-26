@@ -53,7 +53,7 @@ export interface GlobalErrorProps {
 export interface GlobalDataProps {
   error: GlobalErrorProps;
   loading: boolean;
-  columns: { data: ListProps<ColumnProps>; isLoaded: boolean };
+  columns: { data: ListProps<ColumnProps>; currentPage: number; total: number };
   // loadedColumns 保存已经加载过的post-id
   posts: { data: ListProps<PostProps>; loadedColumns: string[] };
   user: UserProps;
@@ -104,7 +104,7 @@ const store = createStore<GlobalDataProps>({
     error: { status: false },
     token: localStorage.getItem('token') || '',
     loading: false,
-    columns: { data: {}, isLoaded: false },
+    columns: { data: {}, currentPage: 0, total: 0 },
     posts: { data: {}, loadedColumns: [] },
     user: { isLogin: false }
   },
@@ -122,8 +122,13 @@ const store = createStore<GlobalDataProps>({
       state.posts.data[newPost._id] = newPost;
     },
     fetchColumns(state, rawData) {
-      state.columns.data = arrToObj(rawData.data.list);
-      state.columns.isLoaded = true;
+      const { data } = state.columns;
+      const { list, count, currentPage } = rawData.data;
+      state.columns = {
+        data: { ...data, ...arrToObj(list) },
+        total: count,
+        currentPage: currentPage * 1
+      };
     },
     fetchColumn(state, rawData) {
       state.columns.data[rawData.data._id] = rawData.data;
@@ -178,9 +183,15 @@ const store = createStore<GlobalDataProps>({
       ctx.commit('fetchColumns', data);
     }, */
     // 使用封装过的函数发起axios请求
-    fetchColumns({ state, commit }) {
-      if (!state.columns.isLoaded) {
-        return asyncAndCommit('/columns', 'fetchColumns', commit);
+    fetchColumns({ state, commit }, params = {}) {
+      // ，params默认是个空对象。解构赋值
+      const { currentPage = 1, pageSize = 6 } = params;
+      if (state.columns.currentPage < currentPage) {
+        return asyncAndCommit(
+          `/columns?currentPage=${currentPage}&pageSize=${pageSize}`,
+          'fetchColumns',
+          commit
+        );
       }
     },
     // 使用参数解构来简化代码
