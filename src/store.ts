@@ -194,20 +194,6 @@ const store = createStore<GlobalDataProps>({
         );
       }
     },
-    // 使用参数解构来简化代码
-    /* fetchColumn({ commit }, cid) {
-      axios.get(`/columns/${cid}`).then(resp => {
-        commit('fetchColumn', resp.data);
-      });
-    }, */
-    /* async fetchColumn({ commit }, cid) {
-      const { data } = await axios.get(`/columns/${cid}`);
-      commit('fetchColumn', data);
-    },
-    async fetchPosts({ commit }, cid) {
-      const { data } = await axios.get(`/columns/${cid}/posts`);
-      commit('fetchPosts', data);
-    } */
     fetchColumn({ state, commit }, cid) {
       if (!state.columns.data[cid]) {
         return asyncAndCommit(`/columns/${cid}`, 'fetchColumn', commit);
