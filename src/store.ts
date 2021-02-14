@@ -50,12 +50,22 @@ export interface GlobalErrorProps {
   status: boolean;
   message?: string;
 }
+
+export interface GlobalColumnProps {
+  data: ListProps<ColumnProps>;
+  currentPage: number;
+  total?: number;
+}
+
+export interface GlobalPostsProps {
+  data: ListProps<PostProps>;
+  loadedColumns: ListProps<{ total?: number; currentPage?: number }>;
+}
 export interface GlobalDataProps {
   error: GlobalErrorProps;
   loading: boolean;
-  columns: { data: ListProps<ColumnProps>; currentPage: number; total: number };
-  // loadedColumns 保存已经加载过的post-id
-  posts: { data: ListProps<PostProps>; loadedColumns: string[] };
+  columns: GlobalColumnProps;
+  posts: GlobalPostsProps;
   user: UserProps;
   token: string;
 }
@@ -95,8 +105,6 @@ const asyncAndCommit = async (
   } else {
     commit(mutationName, data);
   }
-
-  // console.log(data);
   return data;
 };
 const store = createStore<GlobalDataProps>({
@@ -104,8 +112,8 @@ const store = createStore<GlobalDataProps>({
     error: { status: false },
     token: localStorage.getItem('token') || '',
     loading: false,
-    columns: { data: {}, currentPage: 0, total: 0 },
-    posts: { data: {}, loadedColumns: [] },
+    columns: { data: {}, currentPage: 0 },
+    posts: { data: {}, loadedColumns: {} },
     user: { isLogin: false }
   },
   mutations: {
@@ -133,13 +141,20 @@ const store = createStore<GlobalDataProps>({
     fetchColumn(state, rawData) {
       state.columns.data[rawData.data._id] = rawData.data;
     },
-    fetchPosts(state, { data: rawData, extraData: columnId }) {
+    fetchPosts(state, { data: rawData, extraData }) {
+      const { data, loadedColumns } = state.posts;
+      const { list, count, currentPage } = rawData.data;
+      const listData = list as PostProps[];
       // 如果请求完一个column，再请求另一个column 会把第一个column里面的data扔掉。所以需要合并原始对象。展开语法。
       state.posts.data = {
-        ...state.posts.data,
-        ...arrToObj(rawData.data.list)
+        ...data,
+        ...arrToObj(listData)
       };
-      state.posts.loadedColumns.push(columnId);
+      // 缓存的columns。 对象的形式，每个columnId对应一个包含total和currentPage的对象。
+      loadedColumns[extraData] = {
+        total: count,
+        currentPage
+      };
     },
     setLoading(state, status) {
       state.loading = status;
@@ -185,7 +200,7 @@ const store = createStore<GlobalDataProps>({
     // 使用封装过的函数发起axios请求
     fetchColumns({ state, commit }, params = {}) {
       // ，params默认是个空对象。解构赋值
-      const { currentPage = 1, pageSize = 6 } = params;
+      const { currentPage = 1, pageSize = 3 } = params;
       if (state.columns.currentPage < currentPage) {
         return asyncAndCommit(
           `/columns?currentPage=${currentPage}&pageSize=${pageSize}`,
@@ -199,15 +214,21 @@ const store = createStore<GlobalDataProps>({
         return asyncAndCommit(`/columns/${cid}`, 'fetchColumn', commit);
       }
     },
-    fetchPosts({ state, commit }, cid) {
-      if (!state.posts.loadedColumns.includes(cid)) {
+    fetchPosts({ state, commit }, params = {}) {
+      const { cid, currentPage = 1, pageSize = 3 } = params;
+      const { loadedColumns } = state.posts;
+      // 某个确定id的column已经加载到的page
+      const loadedCurrentPage =
+        (loadedColumns[cid] && loadedColumns[cid].currentPage) || 0;
+      if (
+        !Object.keys(loadedColumns).includes(cid) ||
+        loadedCurrentPage < currentPage
+      ) {
         return asyncAndCommit(
-          `/columns/${cid}/posts`,
+          `/columns/${cid}/posts?currentPage=${currentPage}&pageSize=${pageSize}`,
           'fetchPosts',
           commit,
-          {
-            method: 'get'
-          },
+          { method: 'get' },
           cid
         );
       }
@@ -271,6 +292,22 @@ const store = createStore<GlobalDataProps>({
     },
     getCurrentPost: state => (pid: string) => {
       return state.posts.data[pid];
+    },
+    // 已明确cid的column，post的总数
+    getPostsCountByCid: state => (cid: string) => {
+      if (state.posts.loadedColumns[cid]) {
+        return state.posts.loadedColumns[cid].total;
+      } else {
+        return 0;
+      }
+    },
+    // 确定cid的column 当前加载到的页数
+    getPostsCurrentPageByCid: state => (cid: string) => {
+      if (state.posts.loadedColumns[cid]) {
+        return state.posts.loadedColumns[cid].currentPage;
+      } else {
+        return 0;
+      }
     }
   }
 });

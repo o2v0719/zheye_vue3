@@ -10,6 +10,8 @@
       </div>
     </div>
     <post-list :list="list"></post-list>
+    <button class="btn btn-outline-primary mt-2 mb-5 mx-auto btn-block w-25" @click="loadMorePage" v-if="!isLastPage">加载更多</button>
+    <p class="text-muted text-center" v-if="isLastPage">☺ 已加载到最后 ☺</p>
   </div>
 </template>
 
@@ -20,6 +22,8 @@ import { useStore } from 'vuex';
 import { GlobalDataProps, ColumnProps } from '../store';
 import PostList from '../components/PostList.vue';
 import { addColumnAvatar } from '../helper';
+import useLoadMore from '../hooks/useLoadMore';
+
 export default defineComponent({
   components: {
     PostList
@@ -31,7 +35,7 @@ export default defineComponent({
     const currentId = route.params.id;
     onMounted(() => {
       store.dispatch('fetchColumn', currentId);
-      store.dispatch('fetchPosts', currentId);
+      store.dispatch('fetchPosts', { cid: currentId });
     });
     const column = computed(() => {
       const selectColumn = store.getters.getColumnById(currentId) as ColumnProps | undefined;
@@ -41,8 +45,13 @@ export default defineComponent({
       return selectColumn;
     });
     const list = computed(() => store.getters.getPostsByCid(currentId));
+    // 已明确cid的column，post的总数
+    const count = computed(() => store.getters.getPostsCountByCid(currentId));
+    // 确定cid的column 当前加载到的页数
+    const currentPage = computed(() => store.getters.getPostsCurrentPageByCid(currentId));
+    const { loadMorePage, isLastPage } = useLoadMore('fetchPosts', count, { currentPage: currentPage.value, cid: currentId });
     return {
-      list, column
+      list, column, loadMorePage, isLastPage
     };
   },
 });
