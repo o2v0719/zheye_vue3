@@ -7,7 +7,8 @@ import Signup from './views/Signup.vue';
 import PostDetail from './views/PostDetail.vue';
 import store from './store';
 import axios from 'axios';
-const routerHistory = createWebHistory();
+// 这里参数 设置base！！！ 和 vue2 不一样！！！
+const routerHistory = createWebHistory('/zheye/');
 const router = createRouter({
   history: routerHistory,
   routes: [
