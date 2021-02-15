@@ -18,7 +18,7 @@
           <router-link :to="`/column/${user.column}`" class="dropdown-item">我的专栏</router-link>
         </dropdown-item>
         <dropdown-item disabled><a href='#' class="dropdown-item">编辑资料</a></dropdown-item>
-        <dropdown-item><a href='#' class="dropdown-item">退出登陆</a></dropdown-item>
+        <dropdown-item><a href='#' class="dropdown-item" @click.prevent="logout">退出登陆</a></dropdown-item>
       </dropdown>
     </ul>
   </nav>
@@ -28,8 +28,9 @@
 import { defineComponent, PropType } from 'vue';
 import Dropdown from './DropDown.vue';
 import DropdownItem from './DropdownItem.vue';
-import { UserProps } from '../store';
-
+import { GlobalDataProps, UserProps } from '../store';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 export default defineComponent({
   name: 'GlobalHeader',
   components: {
@@ -42,6 +43,15 @@ export default defineComponent({
       // 必填
       required: true
     }
+  },
+  setup() {
+    const store = useStore<GlobalDataProps>();
+    const router = useRouter();
+    const logout = () => {
+      store.dispatch('logout');
+      router.push('/');
+    };
+    return { logout };
   }
 });
 </script>

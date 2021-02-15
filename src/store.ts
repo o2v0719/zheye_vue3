@@ -202,7 +202,7 @@ const store = createStore<GlobalDataProps>({
       // ，params默认是个空对象。解构赋值
       const { currentPage = 1, pageSize = 3 } = params;
       if (state.columns.currentPage < currentPage) {
-        return asyncAndCommit(
+        return getAndCommit(
           `/columns?currentPage=${currentPage}&pageSize=${pageSize}`,
           'fetchColumns',
           commit
@@ -235,6 +235,15 @@ const store = createStore<GlobalDataProps>({
     },
     login({ commit }, payload) {
       return postAndCommit('/user/login', 'login', commit, payload);
+    },
+    // 退出登陆
+    logout({ commit }) {
+      return asyncAndCommit(
+        // 测试接口可用
+        `/columns?currentPage=1&pageSize=3`,
+        'logout',
+        commit
+      );
     },
     fetchCurrentUser({ commit }) {
       return getAndCommit('/user/current', 'fetchCurrentUser', commit);
