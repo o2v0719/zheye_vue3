@@ -8,7 +8,12 @@ import PostDetail from './views/PostDetail.vue';
 import store from './store';
 import axios from 'axios';
 // 这里参数 设置base！！！ 和 vue2 不一样！！！
-const routerHistory = createWebHistory('/zheye/');
+// 因为生产环境下，多一级路由。这里作区分。！！！
+const routerHistory =
+  process.env.NODE_ENV === 'production'
+    ? createWebHistory('/zheye/')
+    : createWebHistory();
+
 const router = createRouter({
   history: routerHistory,
   routes: [

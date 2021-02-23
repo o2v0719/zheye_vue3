@@ -142,6 +142,7 @@ const store = createStore<GlobalDataProps>({
       state.columns.data[rawData.data._id] = rawData.data;
     },
     fetchPosts(state, { data: rawData, extraData }) {
+      console.log('mutation-start');
       const { data, loadedColumns } = state.posts;
       const { list, count, currentPage } = rawData.data;
       const listData = list as PostProps[];
@@ -155,6 +156,7 @@ const store = createStore<GlobalDataProps>({
         total: count,
         currentPage
       };
+      console.log('mutation-end');
     },
     setLoading(state, status) {
       state.loading = status;

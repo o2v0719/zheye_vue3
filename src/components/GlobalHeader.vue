@@ -15,6 +15,7 @@
           <router-link to="/create" class="dropdown-item">新建文章</router-link>
         </dropdown-item>
         <dropdown-item>
+          <!-- 注意路由跳转的bug：路由相同，组件复用，生命周期钩子函数不触发。 -->
           <router-link :to="`/column/${user.column}`" class="dropdown-item">我的专栏</router-link>
         </dropdown-item>
         <dropdown-item disabled><a href='#' class="dropdown-item">编辑资料</a></dropdown-item>
@@ -47,10 +48,15 @@ export default defineComponent({
   setup() {
     const store = useStore<GlobalDataProps>();
     const router = useRouter();
+    // const route = useRoute();
     const logout = () => {
       store.dispatch('logout');
       router.push('/');
     };
+    // watch(() => route.path, () => {
+    //   console.log(route.path);
+    //   router.push(route.path);
+    // });
     return { logout };
   }
 });
